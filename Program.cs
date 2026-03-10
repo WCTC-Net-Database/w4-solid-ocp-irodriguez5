@@ -1,6 +1,8 @@
+using System.Data;
 using W04.Interfaces;
 using W04.Models;
 using W04.Services;
+using Spectre.Console;
 
 namespace W04;
 
@@ -21,7 +23,8 @@ class Program
         while (true)
         {
             Console.WriteLine();
-            Console.WriteLine("=== Character Manager ===");
+            AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Character Management +[/]").RuleStyle("pink1"));
+
             Console.WriteLine("1. Display All Characters");
             Console.WriteLine("2. Find Character by Name");
             Console.WriteLine("3. Find Characters by Profession");
@@ -86,22 +89,34 @@ class Program
 
     static void DisplayAllCharacters()
     {
-        Console.WriteLine("\n--- All Characters ---");
+        AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Display Characters +[/]").RuleStyle("pink1"));
         if (characters.Count == 0)
         {
             Console.WriteLine("No characters found.");
             return;
         }
 
+        Console.WriteLine();
+        Console.WriteLine(new string('-', 70));
+        Console.WriteLine($"{"Name",-20} {"Profession",-12} {"Level",5} {"HP",5}  {"Equipment"}");
+        Console.WriteLine(new string('-', 70));
+
         foreach (var character in characters)
         {
-            Console.WriteLine(character);
+            string equipment = character.Equipment.Count > 0
+                ? string.Join(", ", character.Equipment)
+                : "none";
+
+            Console.WriteLine($"{character.Name,-20} {character.Profession,-12} {character.Level,5} {character.HP,5}  {equipment}");
         }
+
+        Console.WriteLine(new string('-', 70));
+        Console.WriteLine();
     }
 
     static void FindCharacterByName()
     {
-        Console.Write("Enter character name to find: ");
+        AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Find By Name +[/]").RuleStyle("pink1"));
         string name = Console.ReadLine() ?? "";
 
         // Use the handler's FindByName method (LINQ inside!)
@@ -119,6 +134,7 @@ class Program
 
     static void FindCharactersByProfession()
     {
+        AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Find by Profession +[/]").RuleStyle("pink1"));
         Console.Write("Enter character profession to filter (e.g., Fighter, Wizard): ");
         string profession = Console.ReadLine() ?? "";
 
@@ -134,7 +150,8 @@ class Program
 
     static void AddCharacter()
     {
-        Console.WriteLine("\n--- Add New Character ---");
+
+        AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Add New Character +[/]").RuleStyle("pink1"));
 
         Console.Write("Name: ");
         string name = Console.ReadLine() ?? "";
@@ -162,6 +179,7 @@ class Program
 
     static void LevelUpCharacter()
     {
+        AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Level Up Character +[/]").RuleStyle("pink1"));
         Console.Write("Enter the name of the character to level up: ");
         string name = Console.ReadLine() ?? "";
 
@@ -180,7 +198,7 @@ class Program
 
     static void SwitchFileFormat()
     {
-        Console.WriteLine("\n--- Switch File Format ---");
+        AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Switch File Format +[/]").RuleStyle("pink1"));
         Console.WriteLine("1. CSV");
         Console.WriteLine("2. JSON");
         Console.Write("Choose format: ");
@@ -205,4 +223,6 @@ class Program
             Console.WriteLine($"No existing {newFormat.ToUpper()} file found. Keeping current characters.");
         }
     }
+
+
 }

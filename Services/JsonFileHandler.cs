@@ -23,7 +23,8 @@ public class JsonFileHandler : IFileHandler
         _filePath = filePath;
         _jsonOptions = new JsonSerializerOptions
         {
-            WriteIndented = true  // Makes the JSON human-readable
+            WriteIndented = true,
+            PropertyNameCaseInsensitive = true// Makes the JSON human-readable
         };
     }
 
@@ -31,20 +32,20 @@ public class JsonFileHandler : IFileHandler
     {
         // TODO: Implement JSON reading logic
         // Hint:
-        // string json = File.ReadAllText(_filePath);
-        // return JsonSerializer.Deserialize<List<Character>>(json) ?? new List<Character>();
+        string json = File.ReadAllText(_filePath);
+        return JsonSerializer.Deserialize<List<Character>>(json, _jsonOptions) ?? new List<Character>();
 
-        throw new NotImplementedException("Implement JSON reading logic");
+        // throw new NotImplementedException("Implement JSON reading logic");
     }
 
     public void WriteAll(List<Character> characters)
     {
         // TODO: Implement JSON writing logic
         // Hint:
-        // string json = JsonSerializer.Serialize(characters, _jsonOptions);
-        // File.WriteAllText(_filePath, json);
+         string json = JsonSerializer.Serialize(characters, _jsonOptions);
+         File.WriteAllText(_filePath, json);
 
-        throw new NotImplementedException("Implement JSON writing logic");
+       // throw new NotImplementedException("Implement JSON writing logic");
     }
 
     public void AppendCharacter(Character character)
@@ -63,7 +64,15 @@ public class JsonFileHandler : IFileHandler
         // characters.Add(character);
         // WriteAll(characters);
 
-        throw new NotImplementedException("Implement JSON append logic");
+        //throw new NotImplementedException("Implement JSON append logic");
+        var characters = new List<Character>();
+        if (File.Exists(_filePath))
+        {
+            string existingJson = File.ReadAllText(_filePath);
+            characters = JsonSerializer.Deserialize<List<Character>>(existingJson) ?? new List<Character>();
+        }
+        characters.Add(character);
+        WriteAll(characters);
     }
 
     public Character? FindByName(List<Character> characters, string name)
@@ -71,7 +80,7 @@ public class JsonFileHandler : IFileHandler
         // The LINQ logic is the same as CSV - that's the beauty of interfaces!
         // The only difference is HOW we read the data, not how we search it.
         return characters.FirstOrDefault(c =>
-            c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        c.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
     }
 
     public List<Character> FindByProfession(List<Character> characters, string profession)

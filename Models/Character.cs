@@ -1,4 +1,5 @@
 namespace W04.Models;
+using System.Text.Json.Serialization;
 
 /// <summary>
 /// Represents an RPG character with their attributes and equipment.
@@ -20,6 +21,7 @@ public class Character
     /// <summary>
     /// The character's profession (Fighter, Wizard, Rogue, etc.)
     /// </summary>
+    [JsonPropertyName("class")]
     public string Profession { get; set; } = string.Empty;
 
     /// <summary>
