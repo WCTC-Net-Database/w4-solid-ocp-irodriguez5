@@ -3,6 +3,9 @@ using W04.Interfaces;
 using W04.Models;
 using W04.Services;
 using Spectre.Console;
+using System.Net.Http.Headers;
+
+
 
 namespace W04;
 
@@ -31,6 +34,7 @@ class Program
             Console.WriteLine("4. Add Character");
             Console.WriteLine("5. Level Up Character");
             Console.WriteLine("6. Switch File Format (CSV/JSON)");
+            Console.WriteLine("7. Run Game");
             Console.WriteLine("0. Save and Exit");
             Console.Write("Enter your choice: ");
             string choice = Console.ReadLine() ?? "";
@@ -54,6 +58,9 @@ class Program
                     break;
                 case "6":
                     SwitchFileFormat();
+                    break;
+                case "7":
+                    RunGame();
                     break;
                 case "0":
                     fileHandler.WriteAll(characters);
@@ -224,5 +231,40 @@ class Program
         }
     }
 
+    static void RunGame() //i did get copilot help w this one wasn't sure how to setup 
+    {
+        AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Running Game +[/]").RuleStyle("pink1"));
 
+        //enemy entities hard coded
+        var archer = new Archer { Name = "Arthur" };
+        var dragon = new Dragon { Name = "Eragon" };
+        var ghost = new Ghost { Name = "Casper" };
+        var goblin = new Goblin { Name = "Gobby" };
+        // var wizard = new Wizard { Name = "Merlin" };
+
+        var engine = new GameEngine();
+        engine.AddEntity(archer);
+        engine.AddEntity(dragon);
+        engine.AddEntity(ghost);
+        engine.AddEntity(goblin);
+
+        Console.WriteLine("\n-- GameEngineRun --");
+        engine.Run();
+
+        Console.WriteLine("\n--Command Pattern Run --");
+        var commands = new List<ICommand>
+        {
+          new AttackCommand (archer, dragon),
+          new AttackCommand (goblin, ghost),
+          new FlyCommand(ghost),
+          new FlyCommand(dragon),
+          new ShootCommand(archer),
+          new FirebreathingCommand(dragon)
+        };
+        foreach (var cmd in commands)
+        {
+            cmd.Execute();
+        }
+
+    }
 }
