@@ -3,23 +3,19 @@ using W04.Interfaces;
 using W04.Models;
 using W04.Services;
 using Spectre.Console;
-using System.Net.Http.Headers;
-
-
+using Microsoft.Extensions.DependencyInjection;
+using W04.Data;
 
 namespace W04;
 
 class Program
 {
-    // Notice: We use the INTERFACE, not the concrete class!
-    // This is the key to OCP - we can swap implementations without changing this code.
     static IFileHandler fileHandler = null!;
     static List<Character> characters = new();
     static string currentFilePath = string.Empty;
 
     static void Main()
     {
-        // Default to CSV - same data as Week 3, but now using the interface
         SetFileFormat("csv");
         characters = fileHandler.ReadAll();
 
@@ -41,27 +37,13 @@ class Program
 
             switch (choice)
             {
-                case "1":
-                    DisplayAllCharacters();
-                    break;
-                case "2":
-                    FindCharacterByName();
-                    break;
-                case "3":
-                    FindCharactersByProfession();
-                    break;
-                case "4":
-                    AddCharacter();
-                    break;
-                case "5":
-                    LevelUpCharacter();
-                    break;
-                case "6":
-                    SwitchFileFormat();
-                    break;
-                case "7":
-                    RunGame();
-                    break;
+                case "1": DisplayAllCharacters(); break;
+                case "2": FindCharacterByName(); break;
+                case "3": FindCharactersByProfession(); break;
+                case "4": AddCharacter(); break;
+                case "5": LevelUpCharacter(); break;
+                case "6": SwitchFileFormat(); break;
+                case "7": RunGame(); break;
                 case "0":
                     fileHandler.WriteAll(characters);
                     Console.WriteLine($"Characters saved to {currentFilePath}");
@@ -73,35 +55,17 @@ class Program
         }
     }
 
-    /// <summary>
-    /// Sets the file format by swapping the handler implementation.
-    /// This demonstrates OCP - we can add new formats without modifying existing code!
-    /// </summary>
     static void SetFileFormat(string format)
     {
         currentFilePath = Path.Combine("Files", format == "json" ? "input.json" : "input.csv");
-
-        // Swap implementations based on format - THIS is OCP in action!
-        if (format == "json")
-        {
-            fileHandler = new JsonFileHandler(currentFilePath);
-        }
-        else
-        {
-            fileHandler = new CsvFileHandler(currentFilePath);
-        }
-
+        fileHandler = format == "json" ? new JsonFileHandler(currentFilePath) : new CsvFileHandler(currentFilePath);
         Console.WriteLine($"Using {format.ToUpper()} format: {currentFilePath}");
     }
 
     static void DisplayAllCharacters()
     {
         AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Display Characters +[/]").RuleStyle("pink1"));
-        if (characters.Count == 0)
-        {
-            Console.WriteLine("No characters found.");
-            return;
-        }
+        if (characters.Count == 0) { Console.WriteLine("No characters found."); return; }
 
         Console.WriteLine();
         Console.WriteLine(new string('-', 70));
@@ -111,12 +75,9 @@ class Program
         foreach (var character in characters)
         {
             string equipment = character.Equipment.Count > 0
-                ? string.Join(", ", character.Equipment)
-                : "none";
-
+                ? string.Join(", ", character.Equipment) : "none";
             Console.WriteLine($"{character.Name,-20} {character.Profession,-12} {character.Level,5} {character.HP,5}  {equipment}");
         }
-
         Console.WriteLine(new string('-', 70));
         Console.WriteLine();
     }
@@ -124,19 +85,13 @@ class Program
     static void FindCharacterByName()
     {
         AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Find By Name +[/]").RuleStyle("pink1"));
+        Console.Write("Enter name: ");
         string name = Console.ReadLine() ?? "";
-
-        // Use the handler's FindByName method (LINQ inside!)
         var character = fileHandler.FindByName(characters, name);
-
         if (character != null)
-        {
             Console.WriteLine($"Found: {character}");
-        }
         else
-        {
             Console.WriteLine($"No character found with name '{name}'");
-        }
     }
 
     static void FindCharactersByProfession()
@@ -144,43 +99,29 @@ class Program
         AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Find by Profession +[/]").RuleStyle("pink1"));
         Console.Write("Enter character profession to filter (e.g., Fighter, Wizard): ");
         string profession = Console.ReadLine() ?? "";
-
-        // Use the handler's FindByProfession method (LINQ inside!)
         var results = fileHandler.FindByProfession(characters, profession);
-
         Console.WriteLine($"\n--- {profession} Characters ({results.Count} found) ---");
         foreach (var character in results)
-        {
             Console.WriteLine(character);
-        }
     }
 
     static void AddCharacter()
     {
-
         AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Add New Character +[/]").RuleStyle("pink1"));
-
         Console.Write("Name: ");
         string name = Console.ReadLine() ?? "";
-
         Console.Write("Profession (Fighter, Wizard, Rogue, etc.): ");
         string profession = Console.ReadLine() ?? "";
-
         Console.Write("Level: ");
         int.TryParse(Console.ReadLine(), out int level);
-
         Console.Write("HP: ");
         int.TryParse(Console.ReadLine(), out int hp);
-
-        Console.Write("Equipment (comma-separated, e.g., sword,shield,potion): ");
+        Console.Write("Equipment (comma-separated): ");
         string equipmentInput = Console.ReadLine() ?? "";
         var equipment = equipmentInput.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                                      .Select(e => e.Trim())
-                                      .ToList();
-
+                                      .Select(e => e.Trim()).ToList();
         var newCharacter = new Character(name, profession, level, hp, equipment);
         characters.Add(newCharacter);
-
         Console.WriteLine($"Added: {newCharacter}");
     }
 
@@ -189,18 +130,14 @@ class Program
         AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Level Up Character +[/]").RuleStyle("pink1"));
         Console.Write("Enter the name of the character to level up: ");
         string name = Console.ReadLine() ?? "";
-
         var character = fileHandler.FindByName(characters, name);
-
         if (character != null)
         {
             character.Level++;
             Console.WriteLine($"{character.Name} leveled up to level {character.Level}!");
         }
         else
-        {
             Console.WriteLine("Character not found.");
-        }
     }
 
     static void SwitchFileFormat()
@@ -210,16 +147,10 @@ class Program
         Console.WriteLine("2. JSON");
         Console.Write("Choose format: ");
         string choice = Console.ReadLine() ?? "";
-
-        // Save current characters before switching
         fileHandler.WriteAll(characters);
         Console.WriteLine($"Saved to {currentFilePath}");
-
-        // Switch to new format
         string newFormat = choice == "2" ? "json" : "csv";
         SetFileFormat(newFormat);
-
-        // Load characters from new format (or keep current if file doesn't exist)
         try
         {
             characters = fileHandler.ReadAll();
@@ -231,40 +162,18 @@ class Program
         }
     }
 
-    static void RunGame() //i did get copilot help w this one wasn't sure how to setup 
+    static void RunGame()
     {
         AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Running Game +[/]").RuleStyle("pink1"));
 
-        //enemy entities hard coded
-        var archer = new Archer { Name = "Arthur" };
-        var dragon = new Dragon { Name = "Eragon" };
-        var ghost = new Ghost { Name = "Casper" };
-        var goblin = new Goblin { Name = "Gobby" };
-        // var wizard = new Wizard { Name = "Merlin" };
+        // DIP: DI container wires IContext -> DataContext and injects into GameEngine
+        // GameEngine never touches DataContext directly
+        var services = new ServiceCollection();
+        services.AddSingleton<IContext, DataContext>();
+        services.AddTransient<GameEngine>();
+        var provider = services.BuildServiceProvider();
 
-        var engine = new GameEngine();
-        engine.AddEntity(archer);
-        engine.AddEntity(dragon);
-        engine.AddEntity(ghost);
-        engine.AddEntity(goblin);
-
-        Console.WriteLine("\n-- GameEngineRun --");
+        var engine = provider.GetRequiredService<GameEngine>();
         engine.Run();
-
-        Console.WriteLine("\n--Command Pattern Run --");
-        var commands = new List<ICommand>
-        {
-          new AttackCommand (archer, dragon),
-          new AttackCommand (goblin, ghost),
-          new FlyCommand(ghost),
-          new FlyCommand(dragon),
-          new ShootCommand(archer),
-          new FirebreathingCommand(dragon)
-        };
-        foreach (var cmd in commands)
-        {
-            cmd.Execute();
-        }
-
     }
 }

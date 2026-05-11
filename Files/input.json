@@ -1,37 +1,71 @@
 ﻿[
-  {
-    "name": "John, Brave",
-    "class": "Fighter",
-    "level": 1,
-    "hp": 10,
-    "equipment": [ "sword", "shield", "potion" ]
-  },
-  {
-    "name": "Jane",
-    "class": "Wizard",
-    "level": 2,
-    "hp": 6,
-    "equipment": [ "staff", "robe", "book" ]
-  },
-  {
-    "name": "Bob, Sneaky",
-    "class": "Rogue",
-    "level": 3,
-    "hp": 8,
-    "equipment": [ "dagger", "lockpick", "cloak" ]
-  },
-  {
-    "name": "Alice",
-    "class": "Cleric",
-    "level": 4,
-    "hp": 12,
-    "equipment": [ "mace", "armor", "potion" ]
-  },
-  {
-    "name": "Reginald III, Sir",
-    "class": "Knight",
-    "level": 5,
-    "hp": 20,
-    "equipment": [ "sword", "armor", "horse" ]
-  }
+    {
+
+        "$type": "W04.Models.Archer",
+        "name": "John, Brave",
+        "class": "Archer",
+        "level": 1,
+        "hp": 10,
+        "equipment": [ "Bow", "arrows", "potion" ]
+    },
+    {
+        "$type": "W04.Models.Wizard",
+        "name": "Jane",
+        "class": "Wizard",
+        "level": 2,
+        "hp": 6,
+        "equipment": [ "staff", "robe", "book" ]
+    },
+    {
+        "$type": "W04.Models.Goblin",
+        "name": "Bob, Sneaky",
+        "class": "Goblin",
+        "level": 3,
+        "hp": 8,
+        "Treasure": [ "club" ]
+    },
+    {
+        "$type": "W04.Models.Ghost",
+        "name": "Alice",
+        "class": "Ghost",
+        "level": 4,
+        "hp": 12,
+        "Treasure": [ "Haunted Doll" ]
+    },
+    {
+        "$type": "W04.Models.Dragon",
+        "name": "Reginald III, Sir",
+        "class": "Dragon",
+        "level": 5,
+        "hp": 20,
+        "equipment": [ "Gold", "Jewels", "Gold plated armor", "Golden sword" ]
+    },
+
+    {
+        "$type": "W04.Models.Healer",
+        "name": "Agnes the Wise",
+        "class": "Healer",
+        "level": 5,
+        "hp": 20,
+        "equipment": [ "Potion", "Staff", "Herbs" ]
+    },
+
+    {
+        "$type": "W04.Models.Rogue",
+        "name": "Black, Raven",
+        "class": "Rogue",
+        "level": 5,
+        "hp": 20,
+        "equipment": [ "Daggers", "Lock Pick Kit", "Leather Boots" ]
+    },
+
+    {
+        "$type": "W04.Models.Player",
+        "name": "Shreck",
+        "class": "Player",
+        "level": 5,
+        "hp": 20,
+        "Gold":  50
+    }
+
 ]

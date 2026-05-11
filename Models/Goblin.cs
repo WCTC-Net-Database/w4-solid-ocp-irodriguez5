@@ -5,22 +5,28 @@ using System.Text;
 using System.Threading.Tasks;
 using W04.Interfaces;
 
+
 namespace W04.Models
 {
-    public class Goblin : IEntity
+    public class Goblin : CharacterBase, ILootable
     {
-        public required string Name { get; set; }
-        public void Attack(IEntity target)
+        public List<string>? Treasure { get; set; }
+        public Goblin() { }
+        public Goblin(string name, string type, int level, int hp, List<string> treasure) : base(name, type, level, hp)
         {
-            Console.WriteLine($"{Name} strikes {target.Name}");
+            Treasure = treasure;
         }
-        public void Attack()
+
+        
+
+        public override void PerformSpecialAction()
         {
-            Console.WriteLine($"{Name} swings a rusty club");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"{Name} performs a sneaky backstab!");
+            Console.ResetColor();
         }
-        public void Move()
-        {
-            Console.WriteLine($"{Name} shuffles forward");
-        }
+
+     
+
     }
 }

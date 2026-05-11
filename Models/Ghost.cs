@@ -7,28 +7,32 @@ using W04.Interfaces;
 
 namespace W04.Models
 {
-    public class Ghost: IEntity, IFlyable
+    public class Ghost: CharacterBase, IFlyable
     {
-        
-        public required string Name { get; set; }
-        public void Attack(IEntity target)
+        public List<string>? Treasure { get; set; }
+
+        public Ghost(string name, string type, int level, int hp, List<string> treasure) : base(name, type, level, hp)
         {
-            Console.WriteLine($"{Name} attacks {target.Name} with a ghostly touch!");
+            Treasure = treasure;
         }
 
-        public void Attack()
-        {
-            Console.WriteLine($"{Name} attacks with a chilling wail!");
-        }
 
-        public void Move()
-        {
-            Console.WriteLine($"{Name} floats silently through the air.");
-        }
+        public Ghost() { }
+
         public void Fly()
         {
-            Console.WriteLine($"{Name} soars through the sky, leaving a trail of ectoplasm.");
+            Console.WriteLine($"{Name} floats through the air.");
         }
+
+
+        public override void PerformSpecialAction()
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine($"{Name} phases through the walls!");
+            Console.ResetColor();
+        }
+
+
         
     }
 }

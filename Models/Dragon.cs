@@ -7,19 +7,21 @@ using W04.Interfaces;
 
 namespace W04.Models
 {
-    public class Dragon : IEntity, IFlyable, IFireBreathing
+    public class Dragon : CharacterBase, IFlyable, IFireBreathing
     {
-        public required string Name { get; set; }
-        public void Attack(IEntity target)
+        public Dragon(string name, string type, int level, int hp) : base(name, type, level, hp)
+        {
+        }
+
+        public Dragon() { }
+
+
+        public override void Attack(ICharacter target)
         {
             Console.WriteLine($"{Name} attacks {target.Name}");
         }
-        public void Attack()
-        {
-            Console.WriteLine($"{Name} attacks with claws and teeth");
-        }
 
-        public void Move()
+        public override void Move()
         {
             Console.WriteLine($"{Name} moves swiftly");
         }
@@ -32,6 +34,12 @@ namespace W04.Models
             Console.WriteLine($"{Name} breathes fire");
         }
 
-        
+        public override void PerformSpecialAction()
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"{Name} unleashes a fiery breath attack!");
+            Console.ResetColor();
+        }
+
     }
 }

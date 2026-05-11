@@ -7,27 +7,38 @@ using W04.Interfaces;
 
 namespace W04.Models
 {
-    public class Archer : IEntity, IShootable
+    public class Archer : CharacterBase, IShootable
     {
-        public required string Name { get; set; }
 
-        public void Attack(IEntity target)
-        { Console.WriteLine($"{Name} attacks"); }
-
-        public void Attack()
+        public Archer(string name, string type, int level, int hp) : base(name, type, level, hp)
         {
-            Console.WriteLine($"{Name} punches you in the face");
         }
 
-        public void Move()
-        {
-            Console.WriteLine($"{Name} moves forward");
-        }
+        public Archer() { }
 
         public void Shoot()
         {
-            Console.WriteLine($"{Name} shoots arrow");
+            Console.WriteLine($"{Name} shoots an arrow");
         }
+
+        public override void Attack(ICharacter targetr)
+        {
+            Console.WriteLine($"{Name} attacks {targetr.Name} with a bow");
+        }
+
+        public override void Move()
+        {
+            Console.WriteLine($"{Name} moves swiftly");
+        }
+
+        public override void PerformSpecialAction()
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"{Name} performs a powerful headshot!");
+            Console.ResetColor();
+        }
+
+
 
     }
 }

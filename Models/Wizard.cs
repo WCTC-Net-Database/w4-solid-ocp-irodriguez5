@@ -6,15 +6,20 @@ using System.Threading.Tasks;
 
 namespace W04.Models
 {
-    internal class Wizard
+    public class Wizard : CharacterBase
     {
 
-        //CIRCLING BACK TO THIS CLASS
+        public Wizard(string name, int level, int hp) : base(name, "Wizard", level, hp)
+        {
+        }
 
-        //cast spell(s) -> not sure if this has to be generic or if i have to code each specific spell?
+        public Wizard() { }
 
-        //want to have a summon spell to summon dead characters to fight for you?? is this doable witin the scope of this projecct?
-
-        //healing spell? for self and others? 
+        public override void PerformSpecialAction()
+        {
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine($"{Name} casts a powerful spell!");
+            Console.ResetColor();
+        }
     }
 }
