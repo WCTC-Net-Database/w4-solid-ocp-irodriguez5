@@ -31,6 +31,7 @@ class Program
             Console.WriteLine("5. Level Up Character");
             Console.WriteLine("6. Switch File Format (CSV/JSON)");
             Console.WriteLine("7. Run Game");
+            Console.WriteLine("8. Run EF Core Game");
             Console.WriteLine("0. Save and Exit");
             Console.Write("Enter your choice: ");
             string choice = Console.ReadLine() ?? "";
@@ -44,6 +45,7 @@ class Program
                 case "5": LevelUpCharacter(); break;
                 case "6": SwitchFileFormat(); break;
                 case "7": RunGame(); break;
+                case "8": RunEFCoreGame(); break;
                 case "0":
                     fileHandler.WriteAll(characters);
                     Console.WriteLine($"Characters saved to {currentFilePath}");
@@ -167,7 +169,6 @@ class Program
         AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Running Game +[/]").RuleStyle("pink1"));
 
         // DIP: DI container wires IContext -> DataContext and injects into GameEngine
-        // GameEngine never touches DataContext directly
         var services = new ServiceCollection();
         services.AddSingleton<IContext, DataContext>();
         services.AddTransient<GameEngine>();
@@ -175,5 +176,18 @@ class Program
 
         var engine = provider.GetRequiredService<GameEngine>();
         engine.Run();
+    }
+
+    static void RunEFCoreGame()
+    {
+        AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ EF Core Game +[/]").RuleStyle("pink1"));
+
+        using var context = new GameContext();
+        context.Database.EnsureCreated();
+        context.Seed();
+
+        var gameEngine = new EFGameEngine(context);
+        var menu = new EFMenu(gameEngine);
+        menu.Show();
     }
 }

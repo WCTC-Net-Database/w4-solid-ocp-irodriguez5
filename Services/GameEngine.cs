@@ -1,66 +1,149 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
-using W04.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
 using W04.Data;
 using W04.Models;
+using Spectre.Console;
 
-namespace W04.Services
+namespace W04.Services;
+
+public class EFGameEngine
 {
-    public class GameEngine
+    private readonly GameContext _context;
+
+    public EFGameEngine(GameContext context)
     {
-        private readonly IContext _context;
-        private readonly Player? _player;
-        private readonly Dragon? _dragon;
-        private readonly Ghost? _ghost;
-        private readonly Goblin? _goblin;
-        private readonly Archer? _archer;
+        _context = context;
+    }
 
+    // Display all rooms with their characters
+    public void DisplayRooms()
+    {
+        AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Display Rooms +[/]").RuleStyle("pink1"));
 
-        public GameEngine(IContext context)
+        var rooms = _context.Rooms.Include(r => r.Characters).ToList();
+        foreach (var room in rooms)
         {
-            _context = context;
-            _player = _context.Characters.OfType<Player>().FirstOrDefault();
-            _dragon = _context.Characters.OfType<Dragon>().FirstOrDefault();
-            _ghost = _context.Characters.OfType<Ghost>().FirstOrDefault();
-            _goblin = _context.Characters.OfType<Goblin>().FirstOrDefault();
-            _archer = _context.Characters.OfType<Archer>().FirstOrDefault();
+            Console.WriteLine($"Room: {room.Name} - {room.Description}");
+            foreach (var character in room.Characters)
+            {
+                Console.WriteLine($"    Character: {character.Name}, Level: {character.Level}");
+            }
+        }
+    }
+
+    // Display all characters
+    public void DisplayCharacters()
+    {
+        AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Display Characters +[/]").RuleStyle("pink1"));
+
+        var characters = _context.Characters.ToList();
+        if (characters.Any())
+        {
+            Console.WriteLine("\nCharacters:");
+            foreach (var character in characters)
+            {
+                Console.WriteLine($"ID: {character.Id}, Name: {character.Name}, Level: {character.Level}, Room ID: {character.RoomId}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("No characters available.");
+        }
+    }
+
+    // Task 4: Add Room
+    public void AddRoom()
+    {
+        AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Add Room  +[/]").RuleStyle("pink1"));
+
+        Console.Write("Enter room name: ");
+        var name = Console.ReadLine() ?? "";
+
+        Console.Write("Enter room description: ");
+        var description = Console.ReadLine() ?? "";
+
+        var room = new Room { Name = name, Description = description };
+        _context.Rooms.Add(room);
+        _context.SaveChanges();
+
+        Console.WriteLine($"Room '{name}' added to the game.");
+    }
+
+    // Task 5: Add Character
+    public void AddCharacter()
+    {
+        AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Add Characters +[/]").RuleStyle("pink1"));
+
+        Console.Write("Enter character name: ");
+        var name = Console.ReadLine() ?? "";
+
+        Console.Write("Enter character level: ");
+        int.TryParse(Console.ReadLine(), out int level);
+
+        var rooms = _context.Rooms.ToList();
+        if (!rooms.Any())
+        {
+            Console.WriteLine("No rooms available. Please add a room first.");
+            return;
         }
 
-        public void Run()
+        Console.WriteLine("\nAvailable Rooms:");
+        foreach (var r in rooms)
+            Console.WriteLine($"  [{r.Id}] {r.Name}");
+
+        Console.Write("Enter room ID for the character: ");
+        int.TryParse(Console.ReadLine(), out int roomId);
+
+        var room = _context.Rooms.Find(roomId);
+        if (room == null)
         {
-            if (_player == null || _goblin == null)
-            {
-                Console.WriteLine("Missing required characters in data source.");
-                return;
-            }
-
-            // Combat sequence
-            _goblin.Move();
-            _goblin.Attack(_player);
-
-            _player.Move();
-            _player.Attack(_goblin);
-
-            Console.WriteLine($"Player Gold: {_player.Gold}");
-
-
-            Console.WriteLine("\n=== Special Actions ===");
-            _player.PerformSpecialAction();  // "performs a powerful sword strike!"
-            _goblin.PerformSpecialAction();  // "performs a sneaky backstab!"
-
-            // We can also loop through ALL characters and call PerformSpecialAction
-            // This works because they all inherit from CharacterBase!
-            Console.WriteLine("\n=== All Characters' Special Actions ===");
-            foreach (CharacterBase character in _context.Characters)
-            {
-                character.PerformSpecialAction();
-            }
-
+            Console.WriteLine("Room not found!");
+            return;
         }
 
+        var character = new GameCharacter { Name = name, Level = level, RoomId = roomId };
+        _context.Characters.Add(character);
+        _context.SaveChanges();
+
+        Console.WriteLine($"Character '{name}' added to {room.Name}.");
+    }
+
+    // Task 6: Find Character
+    public void FindCharacter()
+    {
+        AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Find Characters +[/]").RuleStyle("pink1"));
+
+        Console.Write("Enter character name to search: ");
+        var name = Console.ReadLine() ?? "";
+
+        var character = _context.Characters
+            .FirstOrDefault(c => c.Name.Contains(name));
+
+        if (character != null)
+            Console.WriteLine($"Found: {character.Name} (Level {character.Level})");
+        else
+            Console.WriteLine("Character not found.");
+    }
+
+    // Level Up Character
+    public void LevelUpCharacter()
+    {
+        AnsiConsole.Write(new Spectre.Console.Rule("[bold pink1]+ Level Up Characters +[/]").RuleStyle("pink1"));
+
+        Console.Write("Enter character name to level up: ");
+        var name = Console.ReadLine() ?? "";
+
+        var character = _context.Characters
+            .FirstOrDefault(c => c.Name == name);
+
+        if (character != null)
+        {
+            character.Level++;
+            _context.SaveChanges();
+            Console.WriteLine($"{character.Name} is now level {character.Level}!");
+        }
+        else
+        {
+            Console.WriteLine("Character not found.");
+        }
     }
 }
