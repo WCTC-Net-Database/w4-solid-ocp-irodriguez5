@@ -4,16 +4,13 @@ using System.Text.Json.Serialization;
 public class Character
 {
     public string Name { get; set; } = string.Empty;
-
     [JsonPropertyName("class")]
     public string Profession { get; set; } = string.Empty;
-
     public int Level { get; set; }
     public int HP { get; set; }
     public List<string> Equipment { get; set; } = new List<string>();
 
     public Character() { }
-
     public Character(string name, string profession, int level, int hp, List<string> equipment)
     {
         Name = name;
